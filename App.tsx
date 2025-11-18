@@ -11,6 +11,9 @@ import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
+import { Provider } from 'react-redux';
+import { persistor, store } from './utils/store';
+import { PersistGate } from 'redux-persist/integration/react';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -18,7 +21,6 @@ function App() {
   return (
     <SafeAreaProvider>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
     </SafeAreaProvider>
   );
 }
@@ -27,12 +29,17 @@ function AppContent() {
   const safeAreaInsets = useSafeAreaInsets();
 
   return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      />
-    </View>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <View style={styles.container}>
+          <NewAppScreen
+            templateFileName="App.tsx"
+            safeAreaInsets={safeAreaInsets}
+          />
+        </View>
+        <AppContent />
+      </PersistGate>
+    </Provider>
   );
 }
 

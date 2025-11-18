@@ -17,6 +17,7 @@
     "react-native": "0.82.1",
     "react-native-mmkv": "^4.0.0",
     "react-native-safe-area-context": "^5.5.2",
+    "react-redux": "^9.2.0",
     "redux-persist": "^6.0.0"
   },
   "devDependencies": {
