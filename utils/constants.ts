@@ -1,0 +1,1 @@
+export const COUNTDOWN_DURATION = 60 * 1000;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Switch } from 'react-native';
 import { useOfflineMode } from './hooks/useOfflineMode';
 
 export function OfflineIndicator() {
@@ -12,21 +12,20 @@ export function OfflineIndicator() {
 
     const interval = setInterval(() => {
       const remaining = getRemainingTime();
+      console.log('remaining time', remaining);
       setRemainingSeconds(Math.ceil(remaining / 1000));
     }, 1000);
 
     return () => clearInterval(interval);
   }, [isCountDownActive, getRemainingTime]);
 
-  if (!isOfflineMode && !isCountDownActive) return null;
-
   return (
     <View style={styles.container}>
-      {isOfflineMode ? (
-        <Text style={styles.text}>📵 Offline Mode</Text>
-      ) : (
+      <Text style={styles.text}> Offline Mode</Text>
+      <Switch value={isOfflineMode} />
+      {isCountDownActive && (
         <Text style={styles.text}>
-          ⏱️ No connection - switching to offline in {remainingSeconds}s
+          No connection - switching to offline in {remainingSeconds}s
         </Text>
       )}
     </View>
@@ -35,12 +34,13 @@ export function OfflineIndicator() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#ff9800',
+    flex: 1,
+    backgroundColor: '#fff9',
     padding: 8,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   text: {
-    color: '#fff',
     fontSize: 14,
     fontWeight: '600',
   },

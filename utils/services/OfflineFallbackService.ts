@@ -8,8 +8,9 @@ import {
 } from '../store/slices/offlineSlice';
 import { logEvent } from '../logger';
 import SyncService from './SyncService';
+import { Alert } from 'react-native';
+import { COUNTDOWN_DURATION } from '../constants';
 
-const COUNTDOWN_DURATION = 5 * 60 * 1000;
 const NETWORK_CHECK_INTERVAL = 10 * 1000;
 
 class OfflineFallbackService {
@@ -88,6 +89,7 @@ class OfflineFallbackService {
     if (state.isOfflineMode) {
       await SyncService.syncAndReturnToOnline();
     }
+    Alert.alert('Internet restored');
   }
   private scheduleCountDownCompletion(duration: number) {
     this.cancelCountdownTimer();
@@ -98,6 +100,10 @@ class OfflineFallbackService {
     }, duration);
   }
   private async triggerOfflineMode() {
+    Alert.alert(
+      'Offline Mode',
+      'You are about to switch to offline mode as there has been no internet for the last 5 minutes',
+    );
     this.cancelCountdownTimer();
     this.stopNetworkChecking();
     storage.remove(STORAGE_KEYS.COUNTDOWN_START);

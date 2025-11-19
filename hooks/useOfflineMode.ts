@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux';
 import { RootState } from '../utils/store';
+import { COUNTDOWN_DURATION } from '../utils/constants';
 export function useOfflineMode() {
   const {
     isOfflineMode,
@@ -13,7 +14,7 @@ export function useOfflineMode() {
   const getRemainingTime = (): number => {
     if (!isCountDownActive || !countDownStartTime) return 0;
     const elapsed = Date.now() - countDownStartTime;
-    const remaining = 5 * 60 * 1000 - elapsed;
+    const remaining = COUNTDOWN_DURATION - elapsed;
     return Math.max(0, remaining);
   };
   return {
