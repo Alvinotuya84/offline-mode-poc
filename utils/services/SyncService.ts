@@ -8,10 +8,10 @@ import {
 import { storage, STORAGE_KEYS } from '../storage';
 import { logEvent } from '../logger';
 class SyncService {
-  async syncAndReturnToOnline() {
+  async syncAndReturnToOnline(): Promise<boolean> {
     const state = store.getState();
     if (!state.offline.isOfflineMode) {
-      return;
+      return true;
     }
     store.dispatch(startSync());
     logEvent('sync_started', {
@@ -40,6 +40,7 @@ class SyncService {
         error: errorMessage,
       });
     }
+    return true;
   }
   private async getPendingItems(): Promise<any[]> {
     return new Promise(resolve => {

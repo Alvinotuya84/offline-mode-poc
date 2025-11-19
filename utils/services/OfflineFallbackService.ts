@@ -87,9 +87,10 @@ class OfflineFallbackService {
       });
     }
     if (state.isOfflineMode) {
-      await SyncService.syncAndReturnToOnline();
+      const synced = await SyncService.syncAndReturnToOnline();
+      if (synced)
+        Alert.alert('Internet restored', 'Switching back to online mode');
     }
-    Alert.alert('Internet restored');
   }
   private scheduleCountDownCompletion(duration: number) {
     this.cancelCountdownTimer();

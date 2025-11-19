@@ -12,7 +12,7 @@ export function OfflineIndicator() {
 
     const interval = setInterval(() => {
       const remaining = getRemainingTime();
-      console.log('remaining time', remaining);
+      //console.log('remaining time', remaining / 1000);
       setRemainingSeconds(Math.ceil(remaining / 1000));
     }, 1000);
 
