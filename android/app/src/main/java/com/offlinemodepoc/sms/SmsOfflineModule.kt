@@ -126,7 +126,7 @@ class SmsOfflineModule(reactContext: ReactApplicationContext) :
         try {
             val config =
                     Arguments.createMap().apply {
-                        putString("authorizedSender", "+1234567890") // Load from config
+                        putString("authorizedSender", "+254748755840") // Load from config
                         putString("offlinePattern", "OFFLINE-\\d{6}")
                         putString("onlinePattern", "ONLINE-\\d{6}")
                     }

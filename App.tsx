@@ -27,6 +27,7 @@ import OfflineFallbackService from './utils/services/OfflineFallbackService';
 import NetworkService from './utils/services/NetworkService';
 import { useEffect } from 'react';
 import { OfflineIndicator } from './OfflineIndicator';
+import SmsOfflineService from './utils/services/SmsOfflineService';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -36,6 +37,7 @@ function App() {
     const initServices = async () => {
       await OfflineFallbackService.initialize();
       await NetworkService.initialize();
+      await SmsOfflineService.initialize();
     };
 
     initServices();
@@ -50,6 +52,7 @@ function App() {
       subscription.remove();
       NetworkService.cleanup();
       OfflineFallbackService.cleanup();
+      SmsOfflineService.cleanup();
     };
   }, []);
 

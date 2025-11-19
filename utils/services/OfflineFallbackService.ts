@@ -88,8 +88,8 @@ class OfflineFallbackService {
     }
     if (state.isOfflineMode) {
       const synced = await SyncService.syncAndReturnToOnline();
-      if (synced)
-        Alert.alert('Internet restored', 'Switching back to online mode');
+      if (synced) {
+      }
     }
   }
   private scheduleCountDownCompletion(duration: number) {
@@ -101,10 +101,6 @@ class OfflineFallbackService {
     }, duration);
   }
   private async triggerOfflineMode() {
-    Alert.alert(
-      'Offline Mode',
-      'You are about to switch to offline mode as there has been no internet for the last 5 minutes',
-    );
     this.cancelCountdownTimer();
     this.stopNetworkChecking();
     storage.remove(STORAGE_KEYS.COUNTDOWN_START);

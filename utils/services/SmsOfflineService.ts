@@ -1,5 +1,4 @@
 import {
-  NativeModule,
   NativeEventEmitter,
   PermissionsAndroid,
   Platform,
@@ -33,8 +32,7 @@ class SmsOfflineService {
 
   async checkPendingAction() {
     try {
-      const pendingAction =
-        await SmsOfflineModule.checkPendingSmsAction.checkPendingSmsAction();
+      const pendingAction = await SmsOfflineModule.checkPendingSmsAction();
 
       if (pendingAction) {
         logEvent('sms_pending_action_found', {

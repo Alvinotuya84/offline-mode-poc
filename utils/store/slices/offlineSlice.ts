@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Alert } from 'react-native';
 export interface OfflineState {
   isOfflineMode: boolean;
   isCountDownActive: boolean;
@@ -35,9 +36,14 @@ const offlineSlice = createSlice({
       state.isOfflineMode = true;
       state.isCountDownActive = false;
       state.countDownStartTime = null;
+      Alert.alert(
+        'Offline Mode',
+        'You are about to switch to offline mode as there has been no internet for the last 5 minutes',
+      );
     },
     exitOfflineMode: state => {
       state.isOfflineMode = false;
+      Alert.alert('Internet restored', 'Switching back to online mode');
     },
     setLastKnownConnection: (state, action: PayloadAction<boolean>) => {
       state.lastKnownConnection = action.payload;
