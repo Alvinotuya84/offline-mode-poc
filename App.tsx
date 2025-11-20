@@ -5,21 +5,14 @@
  * @format
  */
 
-import //NewAppScreen
-'@react-native/new-app-screen';
+import '@react-native/new-app-screen';
 import {
   AppState,
   AppStateStatus,
   StatusBar,
-  View,
-  //StyleSheet,
   useColorScheme,
-  // View,
 } from 'react-native';
-import {
-  SafeAreaProvider,
-  //useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './utils/store';
@@ -33,7 +26,6 @@ function App() {
   const isDarkMode = useColorScheme() === 'dark';
 
   useEffect(() => {
-    // Initialize services
     const initServices = async () => {
       await OfflineFallbackService.initialize();
       await NetworkService.initialize();
@@ -42,7 +34,6 @@ function App() {
 
     initServices();
 
-    // Handle app state changes (background/foreground)
     const subscription = AppState.addEventListener(
       'change',
       handleAppStateChange,
@@ -58,6 +49,7 @@ function App() {
 
   const handleAppStateChange = async (nextAppState: AppStateStatus) => {
     if (nextAppState === 'active') {
+      await SmsOfflineService.checkPendingAction();
       const hasInternet = await NetworkService.checkInternetNow();
       console.log('App resumed, internet:', hasInternet);
     }
@@ -74,25 +66,6 @@ function App() {
     </Provider>
   );
 }
-
-// function AppContent() {
-//   const safeAreaInsets = useSafeAreaInsets();
-
-//   return (
-//     <View style={styles.container}>
-//       <NewAppScreen
-//         templateFileName="App.tsx"
-//         safeAreaInsets={safeAreaInsets}
-//       />
-//     </View>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//   },
-// });
 
 export default App;
 

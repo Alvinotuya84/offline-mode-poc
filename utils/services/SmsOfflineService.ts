@@ -50,10 +50,10 @@ class SmsOfflineService {
   private async handleSmsAction(action: 'offline' | 'online', otp: string) {
     logEvent('sms_action_processing', { action, otp });
     if (action === 'offline') {
-      store.dispatch(enterOfflineMode());
+      store.dispatch(enterOfflineMode({ source: 'sms' }));
       logEvent('offline_mode_enabled_via_sms', { otp });
     } else if (action === 'online') {
-      store.dispatch(exitOfflineMode());
+      store.dispatch(exitOfflineMode({ source: 'sms' }));
       logEvent('online_mode_enabled_via_sms', { otp });
     }
   }

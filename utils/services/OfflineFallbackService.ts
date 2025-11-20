@@ -8,7 +8,6 @@ import {
 } from '../store/slices/offlineSlice';
 import { logEvent } from '../logger';
 import SyncService from './SyncService';
-import { Alert } from 'react-native';
 import { COUNTDOWN_DURATION } from '../constants';
 
 const NETWORK_CHECK_INTERVAL = 10 * 1000;
@@ -56,6 +55,11 @@ class OfflineFallbackService {
 
   async handleInternetLost() {
     const state = store.getState().offline;
+    if (state.smsTriggeredOffline) {
+      logEvent('internet_lost_ignored_sms_priority', {
+        reason: 'SMS-triggered offline mode active',
+      });
+    }
     if (state.isOfflineMode || state.isCountDownActive) {
       return;
     }
@@ -86,10 +90,14 @@ class OfflineFallbackService {
         reason: 'internet_restored',
       });
     }
-    if (state.isOfflineMode) {
+    if (state.isOfflineMode && !state.smsTriggeredOffline) {
       const synced = await SyncService.syncAndReturnToOnline();
       if (synced) {
       }
+    } else if (state.smsTriggeredOffline) {
+      logEvent('sync_skipped_sms_priority', {
+        reason: 'SMS-triggered offline mode active, network cannot override',
+      });
     }
   }
   private scheduleCountDownCompletion(duration: number) {
@@ -104,9 +112,10 @@ class OfflineFallbackService {
     this.cancelCountdownTimer();
     this.stopNetworkChecking();
     storage.remove(STORAGE_KEYS.COUNTDOWN_START);
-    store.dispatch(enterOfflineMode());
+    store.dispatch(enterOfflineMode({ source: 'network' }));
     logEvent('offline_mode_triggered', {
       timestamp: Date.now(),
+      source: 'network',
     });
   }
   private cancelCountdownTimer() {

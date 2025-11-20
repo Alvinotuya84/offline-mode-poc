@@ -1,5 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Alert } from 'react-native';
+
+export type OfflineTriggerSource = 'network' | 'sms' | null;
+export interface SyncRecord {
+  timestamp: number;
+  success: boolean;
+  itemsSynced: number;
+  error?: string;
+}
 export interface OfflineState {
   isOfflineMode: boolean;
   isCountDownActive: boolean;
@@ -8,6 +16,9 @@ export interface OfflineState {
   syncInProgress: boolean;
   syncError: string | null;
   pendingSyncItems: number;
+  offlineTriggerSouce: OfflineTriggerSource;
+  lastSuccesfulSync: SyncRecord | null;
+  smsTriggeredOffline: boolean;
 }
 
 const initialState: OfflineState = {
@@ -17,6 +28,9 @@ const initialState: OfflineState = {
   lastKnownConnection: true,
   syncInProgress: false,
   syncError: null,
+  offlineTriggerSouce: null,
+  lastSuccesfulSync: null,
+  smsTriggeredOffline: false,
   pendingSyncItems: 0,
 };
 
@@ -32,18 +46,33 @@ const offlineSlice = createSlice({
       state.isCountDownActive = false;
       state.countDownStartTime = null;
     },
-    enterOfflineMode: state => {
+    enterOfflineMode: (
+      state,
+      action: PayloadAction<{ source: OfflineTriggerSource }>,
+    ) => {
+      if (!state.isOfflineMode) {
+        Alert.alert('Offline Mode', 'You are about to switch to offline mode');
+      }
+
       state.isOfflineMode = true;
       state.isCountDownActive = false;
       state.countDownStartTime = null;
-      Alert.alert(
-        'Offline Mode',
-        'You are about to switch to offline mode as there has been no internet for the last 5 minutes',
-      );
+      state.offlineTriggerSouce = action.payload.source;
+      if (action.payload.source === 'sms') {
+        state.smsTriggeredOffline = true;
+      }
     },
-    exitOfflineMode: state => {
+    exitOfflineMode: (
+      state,
+      action: PayloadAction<{ source: OfflineTriggerSource }>,
+    ) => {
+      if (state.isOfflineMode)
+        Alert.alert('Online Mode Restored', 'Switching back to online mode');
       state.isOfflineMode = false;
-      Alert.alert('Internet restored', 'Switching back to online mode');
+      state.offlineTriggerSouce = null;
+      if (action.payload.source === 'sms') {
+        state.smsTriggeredOffline = false;
+      }
     },
     setLastKnownConnection: (state, action: PayloadAction<boolean>) => {
       state.lastKnownConnection = action.payload;
@@ -52,10 +81,18 @@ const offlineSlice = createSlice({
       state.syncInProgress = true;
       state.syncError = null;
     },
-    syncSuccess: state => {
+    syncSuccess: (state, action: PayloadAction<{ itemsSynced: number }>) => {
       state.syncInProgress = false;
       state.pendingSyncItems = 0;
-      state.isOfflineMode = false; // user returns to normal online swap once sync is complete and succesful
+      state.lastSuccesfulSync = {
+        timestamp: Date.now(),
+        success: true,
+        itemsSynced: action.payload.itemsSynced,
+      };
+      if (!state.smsTriggeredOffline) {
+        state.isOfflineMode = false;
+        state.offlineTriggerSouce = null;
+      }
     },
     syncFailure: (state, action: PayloadAction<string>) => {
       state.syncInProgress = false;
@@ -63,6 +100,9 @@ const offlineSlice = createSlice({
     },
     setPendingItems: (state, action: PayloadAction<number>) => {
       state.pendingSyncItems = action.payload;
+    },
+    clearSmsTriggeredFlag: state => {
+      state.smsTriggeredOffline = false;
     },
   },
 });
@@ -77,6 +117,7 @@ export const {
   syncSuccess,
   syncFailure,
   setPendingItems,
+  clearSmsTriggeredFlag,
 } = offlineSlice.actions;
 
 export default offlineSlice.reducer;
